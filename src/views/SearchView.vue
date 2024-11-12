@@ -8,21 +8,21 @@ import SongPlayer from '@/components/SongPlayer.vue';
 
 import { ref } from 'vue';
 
-import { fetchSongOptions } from '../api.ts';
-import type { Song } from '../interfaces.ts';
+import { fetchSongOptions } from '../api';
+import type { Song } from '../interfaces';
 
-const searchValue = ref<String>('');
+const searchValue = ref<string>('');
 const songs = ref<Song[]>([]);
-// const selectedSong = ref<Song | null>(null);
-const selectedSong = ref<Song | null>({
-    "title": "Sh-Boom",
-    "channel": "The Chords - Topic",
-    "url": "http://www.youtube.com/watch?v=ESLa421KQaM"
-});
+const selectedSong = ref<Song | null>(null);
+// const selectedSong = ref<Song | null>({
+//     "title": "Sh-Boom",
+//     "channel": "The Chords - Topic",
+//     "url": "http://www.youtube.com/watch?v=ESLa421KQaM"
+// });
 
 const getSongOptions = async () => {
   const songOptions = await fetchSongOptions(searchValue.value);
-  songs.value = songOptions;
+  songs.value = songOptions ?? [];
   console.log("songs.value = ", songs.value);
 }
 </script>

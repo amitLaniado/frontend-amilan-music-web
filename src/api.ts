@@ -20,7 +20,7 @@ export const fetchMp3File = async (songUrl: string): Promise<string | undefined>
             song_url: songUrl,
         };
       
-        const response = await axios.post('/song/download', requestData, {
+        const response = await axios.post(`${baseUrl}/song/download`, requestData, {
             responseType: 'blob',  // Expect a binary response (file)
         });
         const blob = new Blob([response.data], { type: 'audio/mp3' });

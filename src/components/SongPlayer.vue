@@ -1,25 +1,55 @@
 <script setup lang="ts">
-import Card from 'primevue/card';
+// import Card from 'primevue/card';
+import Slider from 'primevue/slider';
 
-import { defineProps, ref, onMounted } from 'vue';
+import { defineProps, ref, onMounted, watch } from 'vue';
 
-import { fetchMp3File } from '@/api.ts';
+import { type Song } from '@/interfaces';
+import { fetchMp3File } from '@/api';
 
-const props = defineProps(['song']);
-// song = { title, channel, url }
+const props = defineProps<{ song: Song }>();
 
-const mp3Url = ref<String>('')
-const isPlaying = ref(false);
+const mp3Url = ref<string>('')
+const isPlaying = ref<boolean>(false);
+const audio = ref<HTMLAudioElement | null>(null);
+const currentTime = ref<number>(0);
+const duration = ref<number>(0);
+
+const initializeAudio = async () => {
+    audio.value = new Audio(mp3Url.value);
+    audio.value.addEventListener('timeupdate', () => {
+        currentTime.value = audio.value?.currentTime ?? 0;
+        duration.value = audio.value?.duration ?? 0;
+    });
+    await audio.value.play();
+    isPlaying.value = true;
+}
 
 onMounted(async () => {
     URL.revokeObjectURL(mp3Url.value); // Free up memory
-    mp3Url.value = await fetchMp3File(props.song.url);
+    mp3Url.value = await fetchMp3File(props.song.url) ?? '';
+    initializeAudio();
 });
 
-function togglePlay() {
-    isPlaying.value = !isPlaying.value;
+const togglePlay = () => {
+    if (audio.value) {
+        isPlaying.value ? audio.value.pause() : audio.value.play();
+        isPlaying.value = !isPlaying.value;
+    }
 }
 
+const formatSecondsTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+
+    return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+}
+
+const changeCurrentTime = (value: number | number[]): void => {
+    const newTime = Array.isArray(value) ? value[0] : value;
+    currentTime.value = newTime;
+    if (audio.value) audio.value.currentTime = newTime;
+}
 </script>
 
 <template>
@@ -32,7 +62,17 @@ function togglePlay() {
         </div>
 
         <div class="timeline">
-            <!-- Add a PrimeVue progress bar or slider if desired -->
+            <Slider 
+                v-model="currentTime"
+                :step="1"
+                :min="0"
+                :max="duration"
+                @update:model-value="changeCurrentTime"
+            />
+            <div class="show-times">
+                <p class="time-text">{{ formatSecondsTime(currentTime) }}</p>
+                <p class="time-text">{{ formatSecondsTime(duration) }}</p>
+            </div>
         </div>
 
         <div class="controls">
@@ -44,10 +84,6 @@ function togglePlay() {
             <i class="pi pi-step-forward control-icon"></i>
         </div>
     </div>
-
-    <!-- Audio player to play the MP3 file -->
-    <audio v-if="mp3Url" :src="mp3Url" controls></audio>
-
 </template>
 
 <style>
@@ -86,6 +122,16 @@ function togglePlay() {
     border-radius: 3px;
     margin: 1rem 0;
     position: relative;
+}
+
+.show-times {
+    display: flex;
+    justify-content: space-between;
+}
+
+.time-text {
+    font-size: smaller;
+    margin-top: 5px;
 }
 
 .controls {
