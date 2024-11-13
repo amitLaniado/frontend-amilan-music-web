@@ -3,25 +3,24 @@ import Card from 'primevue/card';
 
 import { defineProps } from 'vue';
 
-const props = defineProps(['songs']);
+const props = defineProps(['data', 'titleAttrName', 'subtitleAttrName', 'subtitlePrefix']);
 </script>
 
 <template>
-    <div class="songs-container">
+    <div class="container">
         <Card
-            v-for="song in songs"
-            :key="song.url"
-            @click="$emit('selectSong', song)"
+            v-for="(item, index) in data"
+            :key="index"
+            @click="$emit('selectItem', item)"
         >
-            <template #title>{{ song.title }}</template>
-            <template #content>{{ song.channel }}</template>
+            <template #title>{{ item[titleAttrName] }}</template>
+            <template #content>{{ `${subtitlePrefix ?? ''}${item[subtitleAttrName]}` }}</template>
         </Card>
     </div>
 </template>
 
 <style>
-.songs-container{
-    /* max-height: 70%; Set a max height for the scrollable container */
+.container{
     overflow-y: auto;  /* Enable vertical scrolling */
     width: 100%;       /* Full width */
     cursor: pointer;

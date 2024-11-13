@@ -4,8 +4,8 @@ export interface Song {
     url: string;
 }
 
-// export interface Playlist {
-//     id: number;
-//     name: string;
-//     songs_amount: number;
-// }
+export interface PlaylistDetails {
+    id: number;
+    name: string;
+    songs_amount: number;
+}

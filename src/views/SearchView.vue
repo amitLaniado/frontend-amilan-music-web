@@ -3,7 +3,7 @@ import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
 import InputText from 'primevue/inputtext';
 
-import SongsList from '@/components/SongsList.vue';
+import List from '@/components/List.vue';
 import SongPlayer from '@/components/SongPlayer.vue';
 
 import { ref } from 'vue';
@@ -14,11 +14,6 @@ import type { Song } from '../interfaces';
 const searchValue = ref<string>('');
 const songs = ref<Song[]>([]);
 const selectedSong = ref<Song | null>(null);
-// const selectedSong = ref<Song | null>({
-//     "title": "Sh-Boom",
-//     "channel": "The Chords - Topic",
-//     "url": "http://www.youtube.com/watch?v=ESLa421KQaM"
-// });
 
 const getSongOptions = async () => {
   const songOptions = await fetchSongOptions(searchValue.value);
@@ -49,10 +44,12 @@ const getSongOptions = async () => {
           class="search-input"
         />
       </IconField>
-  
-      <SongsList 
-        :songs="songs"
-        @selectSong="(song) => selectedSong = song"
+
+      <List 
+        :data="songs"
+        titleAttrName="title"
+        subtitleAttrName="channel"
+        @selectItem="(song) => selectedSong = song"
       />
     </div>
 
@@ -67,6 +64,10 @@ main {
   align-items: center;
   padding: 20px;
   overflow-y: hidden;
+}
+
+p {
+  text-align: center;
 }
 
 /* Styling for IconField */
