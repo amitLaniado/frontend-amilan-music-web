@@ -2,12 +2,13 @@
 // import Card from 'primevue/card';
 import Slider from 'primevue/slider';
 
-import { defineProps, ref, onMounted, watch } from 'vue';
+import { defineProps, defineEmits, ref, onMounted, watch } from 'vue';
 
 import { type Song } from '@/interfaces';
 import { fetchMp3File } from '@/api';
 
 const props = defineProps<{ song: Song }>();
+const emit = defineEmits(['end']);
 
 const mp3Url = ref<string>('')
 const isPlaying = ref<boolean>(false);
@@ -25,11 +26,30 @@ const initializeAudio = async () => {
     isPlaying.value = true;
 }
 
+const initialize = async () => {
+    mp3Url.value = await fetchMp3File(props.song.url) ?? '';
+    await initializeAudio();
+}
+
 onMounted(async () => {
     URL.revokeObjectURL(mp3Url.value); // Free up memory
-    mp3Url.value = await fetchMp3File(props.song.url) ?? '';
-    initializeAudio();
+    await initialize();
 });
+
+watch(
+    () => props.song.url,
+    async () => {
+        console.log('initialize');
+        await initialize();
+    }
+)
+
+watch(
+    currentTime,
+    () => {
+        currentTime.value === duration.value && emit('end'); 
+    }
+)
 
 const togglePlay = () => {
     if (audio.value) {

@@ -36,7 +36,7 @@ onMounted(async () => {
         titleAttrName="name"
         subtitleAttrName="songs_amount"
         subtitlePrefix="songs amount: "
-        @selectItem="(playlistDetails) => selectedPlaylistDetails = playlistDetails"
+        @selectItem="(index) => selectedPlaylistDetails = playlistsDetails[index]"
       />
     </div>
   </main>
@@ -57,7 +57,7 @@ p {
 }
 
 .playlists-list {
-  display: flex;
+  /* display: flex; */
   width: 400px;
 }
 </style>

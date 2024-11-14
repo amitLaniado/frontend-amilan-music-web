@@ -11,7 +11,7 @@ const props = defineProps(['data', 'titleAttrName', 'subtitleAttrName', 'subtitl
         <Card
             v-for="(item, index) in data"
             :key="index"
-            @click="$emit('selectItem', item)"
+            @click="$emit('selectItem', index)"
         >
             <template #title>{{ item[titleAttrName] }}</template>
             <template #content>{{ `${subtitlePrefix ?? ''}${item[subtitleAttrName]}` }}</template>
@@ -28,6 +28,7 @@ const props = defineProps(['data', 'titleAttrName', 'subtitleAttrName', 'subtitl
 .p-card {
     width: 100%;
     margin-top: 8px;
+    border: 1px solid black;
 }
 .p-card-body {
     padding: 10px !important;

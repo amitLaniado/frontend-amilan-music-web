@@ -49,7 +49,7 @@ const getSongOptions = async () => {
         :data="songs"
         titleAttrName="title"
         subtitleAttrName="channel"
-        @selectItem="(song) => selectedSong = song"
+        @selectItem="(index) => selectedSong = songs[index]"
       />
     </div>
 

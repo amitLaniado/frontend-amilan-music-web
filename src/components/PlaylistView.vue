@@ -8,17 +8,24 @@ import SongPlayer from './SongPlayer.vue';
 const props = defineProps(['playlistDetails']);
 
 const songs = ref<Song[]>([]);
-const selectedSong = ref<Song | null>(null);
+const selectedSongIndex = ref<number | null>(null);
 
 onMounted(async () => {
     songs.value = (await fetcPlaylistSongsDetails(props.playlistDetails.id)) ?? [];
 });
+
+const skipSong = () => {
+    selectedSongIndex.value !== null && 
+        songs.value.length > selectedSongIndex.value && 
+        selectedSongIndex.value++;
+}
 </script>
 
 <template>
     <SongPlayer 
-        v-if="selectedSong"
-        :song="selectedSong"
+        v-if="selectedSongIndex !== null"
+        :song="songs[selectedSongIndex]"
+        @end="skipSong"
     />
 
     <div v-else>
@@ -29,15 +36,15 @@ onMounted(async () => {
             :data="songs"
             titleAttrName="title"
             subtitleAttrName="channel"
-            @selectItem="(song) => selectedSong = song"
+            @selectItem="(index) => selectedSongIndex = index"
         />
+            <!-- @selectItem="(index) => { selectedSongIndex = index; console.log("index = ", index); }" -->
     </div>
 </template>
 
 
 <style scoped>
 .songs-list {
-  display: flex;
   width: 400px;
 }
 </style>
