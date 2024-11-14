@@ -1,11 +1,13 @@
 <script setup lang="ts">
 // import Card from 'primevue/card';
 import Slider from 'primevue/slider';
+import Dialog from 'primevue/dialog';
+import List from './List.vue';
 
 import { defineProps, defineEmits, ref, onMounted, watch } from 'vue';
 
-import { type Song } from '@/interfaces';
-import { fetchMp3File } from '@/api';
+import type { Song, PlaylistDetails } from '@/interfaces';
+import { fetchMp3File, fetcPlaylistsDetails, addSongToPlaylist } from '@/api';
 
 const props = defineProps<{ song: Song }>();
 const emit = defineEmits(['end']);
@@ -15,6 +17,9 @@ const isPlaying = ref<boolean>(false);
 const audio = ref<HTMLAudioElement | null>(null);
 const currentTime = ref<number>(0);
 const duration = ref<number>(0);
+
+const playlistsDetails = ref<PlaylistDetails[]>([]);
+const dialogVisible = ref<boolean>(false);
 
 const initializeAudio = async () => {
     audio.value = new Audio(mp3Url.value);
@@ -70,15 +75,51 @@ const changeCurrentTime = (value: number | number[]): void => {
     currentTime.value = newTime;
     if (audio.value) audio.value.currentTime = newTime;
 }
+
+const showPlaylistsDialog = async () => {
+    const userId = 0;
+    playlistsDetails.value = (await fetcPlaylistsDetails(userId)) ?? [];
+    dialogVisible.value = true;
+}
+
+const addCurrSongToPlaylist = async (playlistIndex: number) => {
+    const playlistId: number = playlistsDetails.value[playlistIndex].id;
+    const playlist_song_id: number | undefined = await addSongToPlaylist(props.song, playlistId);
+    dialogVisible.value = false;
+}
+
 </script>
 
 <template>
     <div class="song-container">
         <div class="img-placeholder"></div>
 
-        <div class="caption">
-            <h2 class="title">{{ song.title }}</h2>
-            <h4 class="subtitle">{{ song.channel }}</h4>
+        <div class="temp-name">
+            <i 
+                class="pi pi-plus-circle add-to-playlist"
+                @click="showPlaylistsDialog"
+            ></i>
+
+            <!-- TODO: put this dialog in new component -->
+            <Dialog
+                v-model:visible="dialogVisible"
+                header="add song to playlist"
+            >
+                <List
+                    :data="playlistsDetails"
+                    class="playlists-list"
+                    titleAttrName="name"
+                    subtitleAttrName="songs_amount"
+                    subtitlePrefix="songs amount: "
+                    @selectItem="addCurrSongToPlaylist"
+                />
+                <!-- TODO: maybe add confirm dialog after adding song to playlist -->
+            </Dialog>
+                
+            <div class="caption">
+                <h2 class="title">{{ song.title }}</h2>
+                <h4 class="subtitle">{{ song.channel }}</h4>
+            </div>
         </div>
 
         <div class="timeline">
@@ -123,10 +164,40 @@ const changeCurrentTime = (value: number | number[]): void => {
     margin-bottom: 1rem;
 }
 
+.temp-name {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.add-to-playlist {
+    padding-top: 0.6rem;
+    font-size: 1.5rem !important;
+    margin-right: 5%;
+}
+
+.p-dialog {
+    width: 80%;
+    height: 70%;
+}
+
+.p-dialog-header {
+    padding-block: 0.5rem 0 !important;
+}
+
+.caption {
+    text-align: right;
+}
+
 .caption .title {
+    width: 100%;
     font-size: 1.5rem;
     font-weight: bold;
-    margin: 0.5rem 0;
+    padding-top: 0;
+    margin-top: 0;
+    /* margin-inline: 0; */
+    margin-left: auto;
+    margin-bottom: 0.3rem;
 }
 
 .caption .subtitle {

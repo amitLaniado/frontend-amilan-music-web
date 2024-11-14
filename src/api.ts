@@ -50,3 +50,13 @@ export const fetcPlaylistSongsDetails = async (playlistId: number): Promise<Song
         console.error("error: ", error);
     }
 };
+
+export const addSongToPlaylist = async (songDetails: Song, playlistId: number): Promise<number | undefined> => {
+    try {
+        const body: { song_details: Song, playlist_id: number} = { song_details: songDetails, playlist_id: playlistId };
+        const response = await axios.post(`${baseUrl}/playlists/add_song`, body);
+        return response.data.playlist_song_id;
+    } catch (error) {
+        console.error("error: ", error);
+    }
+}

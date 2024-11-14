@@ -22,28 +22,42 @@ const skipSong = () => {
 </script>
 
 <template>
-    <SongPlayer 
-        v-if="selectedSongIndex !== null"
-        :song="songs[selectedSongIndex]"
-        @end="skipSong"
-    />
-
-    <div v-else>
-        <p>Platlist view</p>
-
-        <List 
-            class="songs-list"
-            :data="songs"
-            titleAttrName="title"
-            subtitleAttrName="channel"
-            @selectItem="(index) => selectedSongIndex = index"
+    <main>
+        <SongPlayer 
+            v-if="selectedSongIndex !== null"
+            :song="songs[selectedSongIndex]"
+            @end="skipSong"
         />
-            <!-- @selectItem="(index) => { selectedSongIndex = index; console.log("index = ", index); }" -->
-    </div>
+    
+        <div v-else>
+            <p>Platlist view</p>
+    
+            <List 
+                class="songs-list"
+                :data="songs"
+                titleAttrName="title"
+                subtitleAttrName="channel"
+                @selectItem="(index) => selectedSongIndex = index"
+            />
+                <!-- @selectItem="(index) => { selectedSongIndex = index; console.log("index = ", index); }" -->
+        </div>
+    </main>
 </template>
 
 
 <style scoped>
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  overflow-y: hidden;
+}
+
+p {
+  text-align: center;
+}
+
 .songs-list {
   width: 400px;
 }
