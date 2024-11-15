@@ -9,25 +9,31 @@ import SongPlayer from '@/components/SongPlayer.vue';
 import { ref } from 'vue';
 
 import { fetchSongOptions } from '../api';
-import type { Song } from '../interfaces';
+import type { SongDetails } from '../interfaces';
+import songBuffer from '@/store';
 
 const searchValue = ref<string>('');
-const songs = ref<Song[]>([]);
-const selectedSong = ref<Song | null>(null);
+const songs = ref<SongDetails[]>([]);
+const isSelected = ref<boolean>(false);
 
 const getSongOptions = async () => {
   const songOptions = await fetchSongOptions(searchValue.value);
   songs.value = songOptions ?? [];
   console.log("songs.value = ", songs.value);
 }
+
+const selectSong = (index: number) => {
+  songBuffer.value.setSongs([songs.value[index]]);
+  isSelected.value = true;
+}
 </script>
 
 <template>
   <main>
     <SongPlayer 
-      v-if="selectedSong"
-      :song="selectedSong" 
+      v-if="isSelected"
     />
+      <!-- :song="selectedSong"  -->
 
     <div
       v-else 
@@ -49,7 +55,7 @@ const getSongOptions = async () => {
         :data="songs"
         titleAttrName="title"
         subtitleAttrName="channel"
-        @selectItem="(index) => selectedSong = songs[index]"
+        @selectItem="selectSong"
       />
     </div>
 

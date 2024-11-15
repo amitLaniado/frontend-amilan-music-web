@@ -1,9 +1,9 @@
 import axios from 'axios';
-import type { PlaylistDetails, Song } from './interfaces.ts';
+import type { PlaylistDetails, SongDetails } from './interfaces.ts';
 
 const baseUrl = "http://127.0.0.1:8000";
 
-export const fetchSongOptions = async (songName: string): Promise<Song[] | undefined> => {
+export const fetchSongOptions = async (songName: string): Promise<SongDetails[] | undefined> => {
     try {
         console.log("search song options for: ", songName);
 
@@ -42,7 +42,7 @@ export const fetcPlaylistsDetails = async (userId: number): Promise<PlaylistDeta
     }
 };
 
-export const fetcPlaylistSongsDetails = async (playlistId: number): Promise<Song[] | undefined> => {
+export const fetcPlaylistSongsDetails = async (playlistId: number): Promise<SongDetails[] | undefined> => {
     try {
         const response = await axios.get(`${baseUrl}/playlists/${playlistId}`);
         return response.data.songs_details;
@@ -51,9 +51,9 @@ export const fetcPlaylistSongsDetails = async (playlistId: number): Promise<Song
     }
 };
 
-export const addSongToPlaylist = async (songDetails: Song, playlistId: number): Promise<number | undefined> => {
+export const addSongToPlaylist = async (songDetails: SongDetails, playlistId: number): Promise<number | undefined> => {
     try {
-        const body: { song_details: Song, playlist_id: number} = { song_details: songDetails, playlist_id: playlistId };
+        const body: { song_details: SongDetails, playlist_id: number} = { song_details: songDetails, playlist_id: playlistId };
         const response = await axios.post(`${baseUrl}/playlists/add_song`, body);
         return response.data.playlist_song_id;
     } catch (error) {

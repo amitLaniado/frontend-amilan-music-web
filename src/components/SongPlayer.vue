@@ -4,15 +4,12 @@ import Slider from 'primevue/slider';
 import Dialog from 'primevue/dialog';
 import List from './List.vue';
 
-import { defineProps, defineEmits, ref, onMounted, watch } from 'vue';
+import { ref, watch } from 'vue';
 
-import type { Song, PlaylistDetails } from '@/interfaces';
-import { fetchMp3File, fetcPlaylistsDetails, addSongToPlaylist } from '@/api';
+import type { PlaylistDetails } from '@/interfaces';
+import { fetcPlaylistsDetails, addSongToPlaylist } from '@/api';
+import songBuffer from '@/store';
 
-const props = defineProps<{ song: Song }>();
-const emit = defineEmits(['end']);
-
-const mp3Url = ref<string>('')
 const isPlaying = ref<boolean>(false);
 const audio = ref<HTMLAudioElement | null>(null);
 const currentTime = ref<number>(0);
@@ -21,38 +18,34 @@ const duration = ref<number>(0);
 const playlistsDetails = ref<PlaylistDetails[]>([]);
 const dialogVisible = ref<boolean>(false);
 
-const initializeAudio = async () => {
-    audio.value = new Audio(mp3Url.value);
-    audio.value.addEventListener('timeupdate', () => {
-        currentTime.value = audio.value?.currentTime ?? 0;
-        duration.value = audio.value?.duration ?? 0;
-    });
-    await audio.value.play();
-    isPlaying.value = true;
-}
+const initializeAudio = () => {
+    if (audio.value) {
+        audio.value.pause(); // Pause existing audio if it's playing
+    }
 
-const initialize = async () => {
-    mp3Url.value = await fetchMp3File(props.song.url) ?? '';
-    await initializeAudio();
+    const currSongMp3Url = songBuffer.value.getCurrSongMp3Url();
+    if (currSongMp3Url) {
+        audio.value = new Audio(currSongMp3Url);
+        audio.value.addEventListener('timeupdate', () => {
+            currentTime.value = audio.value?.currentTime ?? 0;
+            duration.value = audio.value?.duration ?? 0;
+        });
+        audio.value.play();
+        isPlaying.value = true;
+    }
 }
-
-onMounted(async () => {
-    URL.revokeObjectURL(mp3Url.value); // Free up memory
-    await initialize();
-});
 
 watch(
-    () => props.song.url,
-    async () => {
-        console.log('initialize');
-        await initialize();
+    () => songBuffer.value.getCurrSongMp3Url(),
+    (mp3Url) => {
+        if (mp3Url) initializeAudio();
     }
-)
+);
 
 watch(
     currentTime,
     () => {
-        currentTime.value === duration.value && emit('end'); 
+        currentTime.value === duration.value && songBuffer.value.skipSong(); 
     }
 )
 
@@ -84,7 +77,8 @@ const showPlaylistsDialog = async () => {
 
 const addCurrSongToPlaylist = async (playlistIndex: number) => {
     const playlistId: number = playlistsDetails.value[playlistIndex].id;
-    const playlist_song_id: number | undefined = await addSongToPlaylist(props.song, playlistId);
+    const playlist_song_id: number | undefined = 
+        await addSongToPlaylist(songBuffer.value.getCurrSongDetails(), playlistId);
     dialogVisible.value = false;
 }
 
@@ -117,8 +111,8 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
             </Dialog>
                 
             <div class="caption">
-                <h2 class="title">{{ song.title }}</h2>
-                <h4 class="subtitle">{{ song.channel }}</h4>
+                <h2 class="title">{{ songBuffer.getCurrSongDetails().title }}</h2>
+                <h4 class="subtitle">{{ songBuffer.getCurrSongDetails().channel }}</h4>
             </div>
         </div>
 
@@ -180,11 +174,14 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
     width: 80%;
     height: 70%;
 }
-
 .p-dialog-header {
     padding-block: 0.5rem 0 !important;
 }
-
+/* .p-button-icon {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+ */
 .caption {
     text-align: right;
 }

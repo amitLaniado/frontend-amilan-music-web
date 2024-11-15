@@ -1,7 +1,12 @@
-export interface Song {
+export interface SongDetails {
     title: string;
     channel: string;
     url: string;
+}
+
+export interface Song {
+    songDetails: SongDetails;
+    mp3Url: string | null;
 }
 
 export interface PlaylistDetails {
