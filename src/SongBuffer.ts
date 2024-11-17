@@ -23,6 +23,13 @@ class SongBuffer {
     private isLastSong(): boolean {
         return this.songs.length - 1 > this.currSongIndex;
     }
+    private isFirstSong(): boolean {
+        return this.currSongIndex === 0;
+    }
+
+    public isEmpty(): boolean {
+        return !!this.songs.length;
+    }
 
     public async setSongs(songsDetails: SongDetails[], index: number = 0) {
         this.songs = songsDetails.map(songDetails => ({ 
@@ -45,6 +52,12 @@ class SongBuffer {
         this.currSongIndex = this.isLastSong() ? 
             0 : this.currSongIndex + 1;
         !this.isLastSong() && this.loadMp3Url(this.currSongIndex + 1);
+    }
+
+    public previousSong() {
+        this.currSongIndex = this.isFirstSong() ? 
+            this.songs.length - 1 : this.currSongIndex - 1;
+        !this.isFirstSong() && this.loadMp3Url(this.currSongIndex - 1);
     }
 
     public revokeMp3Url(index: number) {

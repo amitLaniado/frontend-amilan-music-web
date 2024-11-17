@@ -10,7 +10,7 @@ import { ref } from 'vue';
 
 import { fetchSongOptions } from '../api';
 import type { SongDetails } from '../interfaces';
-import songBuffer from '@/store';
+import { songBuffer } from '@/store';
 
 const searchValue = ref<string>('');
 const songs = ref<SongDetails[]>([]);

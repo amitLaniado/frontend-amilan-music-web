@@ -3,13 +3,11 @@ import { defineProps, onMounted, ref } from 'vue';
 import { type SongDetails } from '@/interfaces';
 import { fetcPlaylistSongsDetails } from '@/api';
 import List from '@/components/List.vue';
-import SongPlayer from './SongPlayer.vue';
-import songBuffer from '@/store';
+import { songBuffer, showSongPlayer } from '@/store';
 
 const props = defineProps(['playlistDetails']);
 
 const songs = ref<SongDetails[]>([]);
-const isSelected = ref<boolean>(false);
 
 onMounted(async () => {
     songs.value = (await fetcPlaylistSongsDetails(props.playlistDetails.id)) ?? [];
@@ -17,33 +15,24 @@ onMounted(async () => {
 
 const selectSong = (index: number) => {
   songBuffer.value.setSongs(songs.value, index);
-  isSelected.value = true;
+  showSongPlayer.value = true;
 }
 
 </script>
 
 <template>
     <main>
-        <SongPlayer 
-            v-if="isSelected"
+        <p>Platlist view</p>
+
+        <!-- button to play the playlist -->
+        <!-- button to shaffle -->
+        <List 
+            class="songs-list"
+            :data="songs"
+            titleAttrName="title"
+            subtitleAttrName="channel"
+            @selectItem="selectSong"
         />
-            <!-- :song="songs[selectedSongIndex]" -->
-            <!-- @end="skipSong" -->
-    
-        <div v-else>
-            <p>Platlist view</p>
-    
-            <!-- button to play the playlist -->
-            <!-- button to shaffle -->
-            <List 
-                class="songs-list"
-                :data="songs"
-                titleAttrName="title"
-                subtitleAttrName="channel"
-                @selectItem="selectSong"
-            />
-                <!-- @selectItem="(index) => { selectedSongIndex = index; console.log("index = ", index); }" -->
-        </div>
     </main>
 </template>
 

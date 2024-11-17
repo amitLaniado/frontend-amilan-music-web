@@ -8,10 +8,10 @@ import { ref, watch } from 'vue';
 
 import type { PlaylistDetails } from '@/interfaces';
 import { fetcPlaylistsDetails, addSongToPlaylist } from '@/api';
-import songBuffer from '@/store';
+import { songBuffer, isPlaying, audio, togglePlay } from '@/store';
 
-const isPlaying = ref<boolean>(false);
-const audio = ref<HTMLAudioElement | null>(null);
+// const isPlaying = ref<boolean>(false);
+// const audio = ref<HTMLAudioElement | null>(null);
 const currentTime = ref<number>(0);
 const duration = ref<number>(0);
 
@@ -49,13 +49,6 @@ watch(
     }
 )
 
-const togglePlay = () => {
-    if (audio.value) {
-        isPlaying.value ? audio.value.pause() : audio.value.play();
-        isPlaying.value = !isPlaying.value;
-    }
-}
-
 const formatSecondsTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = Math.floor(seconds % 60);
@@ -81,7 +74,6 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
         await addSongToPlaylist(songBuffer.value.getCurrSongDetails(), playlistId);
     dialogVisible.value = false;
 }
-
 </script>
 
 <template>
@@ -98,6 +90,7 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
             <Dialog
                 v-model:visible="dialogVisible"
                 header="add song to playlist"
+                class="playlists-dialog"
             >
                 <List
                     :data="playlistsDetails"
@@ -131,12 +124,18 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
         </div>
 
         <div class="controls">
-            <i class="pi pi-step-backward control-icon"></i>
+            <i 
+                class="pi pi-step-backward control-icon"
+                @click="songBuffer.previousSong()"
+            ></i>
             <i 
                 :class="['control-icon', isPlaying ? 'pi pi-pause' : 'pi pi-play']"
                 @click="togglePlay"
             ></i>
-            <i class="pi pi-step-forward control-icon"></i>
+            <i 
+                class="pi pi-step-forward control-icon"
+                @click="songBuffer.skipSong()"
+            ></i>
         </div>
     </div>
 </template>
@@ -170,7 +169,7 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
     margin-right: 5%;
 }
 
-.p-dialog {
+.playlists-dialog {
     width: 80%;
     height: 70%;
 }
