@@ -1,13 +1,13 @@
 import axios from 'axios';
 import type { PlaylistDetails, SongDetails } from './interfaces.ts';
 
-const baseUrl = "http://127.0.0.1:8000";
+const backendServiceUrl = import.meta.env.VITE_BACKEND_SERVICE_URL;
 
 export const fetchSongOptions = async (songName: string): Promise<SongDetails[] | undefined> => {
     try {
         console.log("search song options for: ", songName);
 
-        const response = await axios.get(`${baseUrl}/song/songOptions/${songName}`);
+        const response = await axios.get(`${backendServiceUrl}/song/songOptions/${songName}`);
         return response.data.songs_details;
     } catch (error) {
         console.error("error: ", error);
@@ -20,7 +20,7 @@ export const fetchMp3File = async (songUrl: string): Promise<string | undefined>
             song_url: songUrl,
         };
       
-        const response = await axios.post(`${baseUrl}/song/download`, requestData, {
+        const response = await axios.post(`${backendServiceUrl}/song/download`, requestData, {
             responseType: 'blob',  // Expect a binary response (file)
         });
         const blob = new Blob([response.data], { type: 'audio/mp3' });
@@ -35,7 +35,7 @@ export const fetchMp3File = async (songUrl: string): Promise<string | undefined>
 export const fetcPlaylistsDetails = async (userId: number): Promise<PlaylistDetails[] | undefined> => {
     try {
         const userId = 0;
-        const response = await axios.get(`${baseUrl}/playlists/user/${userId}`);
+        const response = await axios.get(`${backendServiceUrl}/playlists/user/${userId}`);
         return response.data.playlists_details;
     } catch (error) {
         console.error("error: ", error);
@@ -44,7 +44,7 @@ export const fetcPlaylistsDetails = async (userId: number): Promise<PlaylistDeta
 
 export const fetcPlaylistSongsDetails = async (playlistId: number): Promise<SongDetails[] | undefined> => {
     try {
-        const response = await axios.get(`${baseUrl}/playlists/${playlistId}`);
+        const response = await axios.get(`${backendServiceUrl}/playlists/${playlistId}`);
         return response.data.songs_details;
     } catch (error) {
         console.error("error: ", error);
@@ -54,7 +54,7 @@ export const fetcPlaylistSongsDetails = async (playlistId: number): Promise<Song
 export const addSongToPlaylist = async (songDetails: SongDetails, playlistId: number): Promise<number | undefined> => {
     try {
         const body: { song_details: SongDetails, playlist_id: number} = { song_details: songDetails, playlist_id: playlistId };
-        const response = await axios.post(`${baseUrl}/playlists/add_song`, body);
+        const response = await axios.post(`${backendServiceUrl}/playlists/add_song`, body);
         return response.data.playlist_song_id;
     } catch (error) {
         console.error("error: ", error);
