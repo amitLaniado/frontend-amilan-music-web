@@ -1,7 +1,9 @@
 import axios from 'axios';
 import type { PlaylistDetails, SongDetails } from './interfaces.ts';
 
-const backendServiceUrl = import.meta.env.VITE_BACKEND_SERVICE_URL;
+const backendServiceUrl = import.meta.env.VITE_BACKEND_SERVICE_URL || "http://127.0.0.1:8000";
+
+// combine fetch functions to 2 groups fetch normal requests and fetch mp3 file
 
 export const fetchSongOptions = async (songName: string): Promise<SongDetails[] | undefined> => {
     try {

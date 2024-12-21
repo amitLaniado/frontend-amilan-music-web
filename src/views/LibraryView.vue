@@ -13,7 +13,6 @@ const selectedPlaylistDetails = ref<PlaylistDetails | null>(null);
 
 onMounted(async () => {
   playlistsDetails.value = (await fetcPlaylistsDetails(userId)) ?? [];
-  console.log("playlistsDetails.value = ", playlistsDetails.value);
 });
 
 </script>
