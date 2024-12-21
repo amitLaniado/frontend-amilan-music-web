@@ -21,12 +21,20 @@ class SongBuffer {
     }
 
     private isLastSong(): boolean {
-        return this.songs.length - 1 > this.currSongIndex;
+        return this.songs.length - 1 <= this.currSongIndex;
     }
     private isFirstSong(): boolean {
         return this.currSongIndex === 0;
     }
+    private nextSongIndex(): number {
+        return this.isLastSong() ? 0 : this.currSongIndex + 1;  
+    }
+    private previosSongIndex(): number {
+        return this.isFirstSong() ? 
+            this.songs.length - 1 : this.currSongIndex - 1;
+    }
 
+    
     public isEmpty(): boolean {
         return !!this.songs.length;
     }
@@ -37,27 +45,26 @@ class SongBuffer {
             mp3Url: null
         }));
         this.currSongIndex = index;
-
-        await this.loadMp3Url(this.currSongIndex); // maybe it better dont put this with await and then this and the next loadMp3Url would be simoutensly
-        this.isLastSong() && await this.loadMp3Url(this.currSongIndex + 1);
+        await this.loadMp3Url();
+        this.loadMp3Url(this.nextSongIndex());
     }
 
-    public async loadMp3Url(index: number) {
-        const song = this.songs[index];
-        const songUrl = song.songDetails.url;
-        song.mp3Url = await fetchMp3File(songUrl) ?? null;
+    public async loadMp3Url(index: number = this.currSongIndex) {
+        if (!this.songs[index].mp3Url) {
+            const song = this.songs[index];
+            const songUrl = song.songDetails.url;
+            song.mp3Url = await fetchMp3File(songUrl) ?? null;
+        }
     }
 
     public skipSong() {
-        this.currSongIndex = this.isLastSong() ? 
-            0 : this.currSongIndex + 1;
-        !this.isLastSong() && this.loadMp3Url(this.currSongIndex + 1);
+        this.currSongIndex = this.nextSongIndex();
+        this.loadMp3Url(this.nextSongIndex());
     }
 
     public previousSong() {
-        this.currSongIndex = this.isFirstSong() ? 
-            this.songs.length - 1 : this.currSongIndex - 1;
-        !this.isFirstSong() && this.loadMp3Url(this.currSongIndex - 1);
+        this.currSongIndex = this.previosSongIndex();
+        this.loadMp3Url(this.previosSongIndex());
     }
 
     public revokeMp3Url(index: number) {

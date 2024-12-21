@@ -10,8 +10,6 @@ import type { PlaylistDetails } from '@/interfaces';
 import { fetcPlaylistsDetails, addSongToPlaylist } from '@/api';
 import { songBuffer, isPlaying, audio, togglePlay } from '@/store';
 
-// const isPlaying = ref<boolean>(false);
-// const audio = ref<HTMLAudioElement | null>(null);
 const currentTime = ref<number>(0);
 const duration = ref<number>(0);
 
@@ -21,6 +19,7 @@ const dialogVisible = ref<boolean>(false);
 const initializeAudio = () => {
     if (audio.value) {
         audio.value.pause(); // Pause existing audio if it's playing
+        isPlaying.value = false;
     }
 
     const currSongMp3Url = songBuffer.value.getCurrSongMp3Url();
@@ -45,7 +44,8 @@ watch(
 watch(
     currentTime,
     () => {
-        currentTime.value === duration.value && songBuffer.value.skipSong(); 
+        currentTime.value === duration.value &&
+            songBuffer.value.skipSong(); 
     }
 )
 

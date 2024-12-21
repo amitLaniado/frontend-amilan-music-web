@@ -30,13 +30,7 @@ const selectSong = (index: number) => {
 
 <template>
   <main>
-    <SongPlayer 
-      v-if="isSelected"
-    />
-      <!-- :song="selectedSong"  -->
-
     <div
-      v-else 
       class="search-song-container"
     >
       <p>Search</p>
