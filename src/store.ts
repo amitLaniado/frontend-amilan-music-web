@@ -12,8 +12,10 @@ gainNode.connect(audioContext.destination);
 gainNode.gain.value = 1.0;
 
 export const updateAudioSrcNode = () => {
-    const source: MediaElementAudioSourceNode = audioContext.createMediaElementSource(audio.value);
-    source.connect(gainNode);
+    if (audio.value) {
+        const source: MediaElementAudioSourceNode = audioContext.createMediaElementSource(audio.value);
+        source.connect(gainNode);
+    }
 }
 
 export const updateVolume = (): void => {
