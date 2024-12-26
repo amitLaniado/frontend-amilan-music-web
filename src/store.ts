@@ -6,12 +6,17 @@ export const showSongPlayer = ref<boolean>(false);
 export const isPlaying = ref<boolean>(false);
 export const audio = ref<HTMLAudioElement | null>(null);
 export const volume = ref<number>(1.0); 
-export const audioContext: AudioContext = new AudioContext();
-let gainNode: GainNode = audioContext.createGain();
-gainNode.connect(audioContext.destination);
-gainNode.gain.value = 1.0;
+export let audioContext: AudioContext | null = null;
+let gainNode: GainNode | null;
 
 export const updateAudioSrcNode = () => {
+    if (!audioContext) {
+        audioContext = new AudioContext();
+        gainNode = audioContext.createGain();
+        gainNode.connect(audioContext.destination);
+        gainNode.gain.value = 1.0;
+    }
+    
     if (audio.value) {
         const source: MediaElementAudioSourceNode = audioContext.createMediaElementSource(audio.value);
         source.connect(gainNode);
