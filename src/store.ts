@@ -15,6 +15,12 @@ export const updateAudioSrcNode = () => {
     if (audio.value) {
         const source: MediaElementAudioSourceNode = audioContext.createMediaElementSource(audio.value);
         source.connect(gainNode);
+
+        audio.value.addEventListener("play", () => {
+            audioContext.resume().catch((err: Error) =>
+                console.error("Error resuming AudioContext:", err)
+            );
+        });
     }
 }
 

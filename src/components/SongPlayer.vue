@@ -162,11 +162,7 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
 
 .volume-slider {
     width: 100%;
-    /* height: 6px; */
-    /* background-color: #ddd; */
-    /* border-radius: 3px; */
-    /* margin: 1rem 0; */
-    /* position: relative; */
+    margin-top: 8px;
     margin-bottom: 20px;
 }
 
