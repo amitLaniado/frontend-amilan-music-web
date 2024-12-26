@@ -21,8 +21,8 @@ import { songBuffer, isPlaying, togglePlay } from '@/store';
         </div>
 
         <div class="caption">
-            <h2 class="title">{{ songBuffer.getCurrSongDetails().title }}</h2>
-            <h4 class="subtitle">{{ songBuffer.getCurrSongDetails().channel }}</h4>
+            <h2 class="title">{{ songBuffer.getCurrSongDetails()?.title }}</h2>
+            <h4 class="subtitle">{{ songBuffer.getCurrSongDetails()?.channel }}</h4>
         </div>
     </div>
 </template>

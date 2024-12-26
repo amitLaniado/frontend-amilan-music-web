@@ -10,14 +10,14 @@ class SongBuffer {
         this.currSongIndex = 0;
     }
 
-    public getCurrentSong(): Song {
-        return this.songs[this.currSongIndex];
+    public getCurrentSong(): Song | null {
+        return this.songs.length ? this.songs[this.currSongIndex] : null;
     }
-    public getCurrSongDetails(): SongDetails {
-        return this.songs[this.currSongIndex].songDetails;
+    public getCurrSongDetails(): SongDetails | null {
+        return this.songs.length ? this.songs[this.currSongIndex].songDetails : null;
     }
     public getCurrSongMp3Url(): string | null {
-        return this.songs[this.currSongIndex].mp3Url;
+        return this.songs.length ? this.songs[this.currSongIndex].mp3Url : null;
     }
 
     private isLastSong(): boolean {

@@ -8,7 +8,7 @@ import { ref, watch } from 'vue';
 
 import type { PlaylistDetails } from '@/interfaces';
 import { fetcPlaylistsDetails, addSongToPlaylist } from '@/api';
-import { songBuffer, isPlaying, audio, togglePlay } from '@/store';
+import { songBuffer, isPlaying, audio, togglePlay, volume, updateVolume, updateAudioSrcNode } from '@/store';
 
 const currentTime = ref<number>(0);
 const duration = ref<number>(0);
@@ -29,6 +29,7 @@ const initializeAudio = () => {
             currentTime.value = audio.value?.currentTime ?? 0;
             duration.value = audio.value?.duration ?? 0;
         });
+        updateAudioSrcNode();
         audio.value.play();
         isPlaying.value = true;
     }
@@ -70,14 +71,24 @@ const showPlaylistsDialog = async () => {
 
 const addCurrSongToPlaylist = async (playlistIndex: number) => {
     const playlistId: number = playlistsDetails.value[playlistIndex].id;
-    const playlist_song_id: number | undefined = 
-        await addSongToPlaylist(songBuffer.value.getCurrSongDetails(), playlistId);
+    const currSongDetails = songBuffer.value.getCurrSongDetails();
+    const playlist_song_id: number | undefined = currSongDetails ?
+        await addSongToPlaylist(currSongDetails, playlistId) : undefined;
     dialogVisible.value = false;
 }
 </script>
 
 <template>
     <div class="song-container">
+        <Slider
+            class="volume-slider"
+            v-model="volume"
+            :step="0.1"
+            :min="0.0"
+            :max="2.0"
+            @update:model-value="updateVolume"
+        />
+
         <div class="img-placeholder"></div>
 
         <div class="temp-name">
@@ -147,6 +158,16 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
     align-items: center;
     text-align: center;
     width: 100%;
+}
+
+.volume-slider {
+    width: 100%;
+    /* height: 6px; */
+    /* background-color: #ddd; */
+    /* border-radius: 3px; */
+    /* margin: 1rem 0; */
+    /* position: relative; */
+    margin-bottom: 20px;
 }
 
 .img-placeholder {
