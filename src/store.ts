@@ -10,8 +10,15 @@ export let audioContext: AudioContext | null = null;
 let gainNode: GainNode | null;
 
 export const updateAudioSrcNode = () => {
+    console.log("updateAudioSrcNode");
     if (!audioContext) {
-        audioContext = new AudioContext();
+        console.log("audioContext is null");
+        // audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        if (window.AudioContext || window.webkitAudioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        } else {
+            throw new Error("Web Audio API is not supported in this browser.");
+        }          
         gainNode = audioContext.createGain();
         gainNode.connect(audioContext.destination);
         gainNode.gain.value = 1.0;
