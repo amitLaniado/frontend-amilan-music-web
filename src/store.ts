@@ -16,13 +16,13 @@ export const updateAudioSrcNode = () => {
         gainNode.connect(audioContext.destination);
         gainNode.gain.value = 1.0;
     }
-    
+
     if (audio.value) {
         const source: MediaElementAudioSourceNode = audioContext.createMediaElementSource(audio.value);
-        source.connect(gainNode);
+        gainNode && source.connect(gainNode);
 
         audio.value.addEventListener("play", () => {
-            audioContext.resume().catch((err: Error) =>
+            audioContext?.resume().catch((err: Error) =>
                 console.error("Error resuming AudioContext:", err)
             );
         });
@@ -30,7 +30,7 @@ export const updateAudioSrcNode = () => {
 }
 
 export const updateVolume = (): void => {
-    gainNode.gain.value = volume.value;
+    if (gainNode) gainNode.gain.value = volume.value;
 };
 
 export const togglePlay = () => {
