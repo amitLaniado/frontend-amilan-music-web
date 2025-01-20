@@ -70,8 +70,9 @@ const showPlaylistsDialog = async () => {
 
 const addCurrSongToPlaylist = async (playlistIndex: number) => {
     const playlistId: number = playlistsDetails.value[playlistIndex].id;
-    const playlist_song_id: number | undefined = 
-        await addSongToPlaylist(songBuffer.value.getCurrSongDetails(), playlistId);
+    const currSongDetails = songBuffer.value.getCurrSongDetails();
+    const playlist_song_id: number | undefined = currSongDetails ?
+        await addSongToPlaylist(currSongDetails, playlistId) : undefined;
     dialogVisible.value = false;
 }
 </script>
@@ -104,8 +105,8 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
             </Dialog>
                 
             <div class="caption">
-                <h2 class="title">{{ songBuffer.getCurrSongDetails().title }}</h2>
-                <h4 class="subtitle">{{ songBuffer.getCurrSongDetails().channel }}</h4>
+                <h2 class="title">{{ songBuffer.getCurrSongDetails()?.title }}</h2>
+                <h4 class="subtitle">{{ songBuffer.getCurrSongDetails()?.channel }}</h4>
             </div>
         </div>
 

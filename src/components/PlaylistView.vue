@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import Button from 'primevue/button';
+
 import { defineProps, onMounted, ref } from 'vue';
 import { type SongDetails } from '@/interfaces';
 import { fetcPlaylistSongsDetails } from '@/api';
@@ -18,11 +20,32 @@ const selectSong = (index: number) => {
   showSongPlayer.value = true;
 }
 
+const shuffle = (array: any[]) => { 
+  for (let i = array.length - 1; i > 0; i--) { 
+    const j = Math.floor(Math.random() * (i + 1)); 
+    [array[i], array[j]] = [array[j], array[i]]; 
+  }
+  return array;  
+}; 
+
+const shufflePlaylist = () => {
+  songs.value = shuffle(songs.value);
+}
+
 </script>
 
 <template>
     <main>
         <p>Platlist view</p>
+
+        <Button
+          class="p-button-rounded"
+          @click="shufflePlaylist"
+        >
+          <template #icon>
+            <i class="fa-solid fa-shuffle"></i>
+          </template>
+        </Button>
 
         <!-- button to play the playlist -->
         <!-- button to shaffle -->

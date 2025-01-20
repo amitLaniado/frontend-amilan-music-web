@@ -33,7 +33,7 @@ const selectSong = (index: number) => {
     <div
       class="search-song-container"
     >
-      <p>Search</p>
+      <p class="search-title">Search</p>
       
       <IconField class="custom-iconfield">
         <InputIcon class="pi pi-search search-icon" />
@@ -66,13 +66,12 @@ main {
   overflow-y: hidden;
 }
 
-p {
+.search-title {
   text-align: center;
 }
 
 /* Styling for IconField */
 .custom-iconfield {
-  display: flex;
   align-items: center;
   width: 100%;
   max-width: 400px;
