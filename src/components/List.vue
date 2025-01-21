@@ -7,7 +7,7 @@ const props = defineProps(['data', 'titleAttrName', 'subtitleAttrName', 'subtitl
 </script>
 
 <template>
-    <div class="container">
+    <div class="cards-list">
         <Card
             v-for="(item, index) in data"
             :key="index"
@@ -20,15 +20,14 @@ const props = defineProps(['data', 'titleAttrName', 'subtitleAttrName', 'subtitl
 </template>
 
 <style>
-.container{
+.cards-list {
     overflow-y: auto;  /* Enable vertical scrolling */
     width: 100%;       /* Full width */
-    cursor: pointer;
 }
 .p-card {
     width: 100%;
-    margin-top: 8px;
-    border: 1px solid black;
+    background-color: transparent !important;
+    cursor: pointer;
 }
 .p-card-body {
     padding: 10px !important;
@@ -36,8 +35,10 @@ const props = defineProps(['data', 'titleAttrName', 'subtitleAttrName', 'subtitl
 }
 .p-card-title {
     font-size: 20px !important;
+    color: #fff;
 }
 .p-card-content {
-    font-size: 10px;
+    font-size: 14px;
+    color: #c0c0c0;
 }
 </style>

@@ -45,31 +45,34 @@ import SongMenu from './components/SongMenu.vue';
   </div>
 </template>
 
-<style>
+<!-- <style>
 
-</style>
-<style scoped>
+</style> -->
+<style>
 * {
   padding: 0;
   margin: 0;
 }
 
-.song-player-dialog {
+body {
+  background-color: #121212;
+}
+
+/* .song-player-dialog {
   width: 100vw;
   height: 100vh;
   margin: 0 !important;
 }
-
+ */
 .bottom-things {
   position: fixed;
   bottom: 0;
   width: 100%;
-
 }
 
-.song-menu {
-  /* width: 100vw; */
-}
+/* .song-menu {
+  width: 100vw;
+} */
 
 nav {
   display: flex;

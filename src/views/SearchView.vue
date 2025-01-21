@@ -30,29 +30,24 @@ const selectSong = (index: number) => {
 
 <template>
   <main>
-    <div
-      class="search-song-container"
-    >
-      <p class="search-title">Search</p>
-      
-      <IconField class="custom-iconfield">
-        <InputIcon class="pi pi-search search-icon" />
-        <InputText 
-          v-model="searchValue"
-          placeholder="Search song"
-          @keypress.enter="getSongOptions"
-          class="search-input"
-        />
-      </IconField>
-
-      <List 
-        :data="songs"
-        titleAttrName="title"
-        subtitleAttrName="channel"
-        @selectItem="selectSong"
+    <p class="search-title">Search</p>
+    
+    <IconField class="custom-iconfield">
+      <InputIcon class="pi pi-search search-icon" />
+      <InputText 
+        v-model="searchValue"
+        placeholder="Search song"
+        @keypress.enter="getSongOptions"
+        class="search-input"
       />
-    </div>
+    </IconField>
 
+    <List 
+      :data="songs"
+      titleAttrName="title"
+      subtitleAttrName="channel"
+      @selectItem="selectSong"
+    />
   </main>
 </template>
 
@@ -61,31 +56,32 @@ const selectSong = (index: number) => {
 main {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 20px;
+  padding: 50px 40px 0px;
   overflow-y: hidden;
 }
 
 .search-title {
-  text-align: center;
+  color: #fff;
+  text-align: left;
+  font-size: 1.5rem;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  margin-bottom: 30px;
 }
 
 /* Styling for IconField */
 .custom-iconfield {
-  align-items: center;
-  width: 100%;
-  max-width: 400px;
-  background-color: #f1f3f5; /* Light background color */
-  border: 1px solid #d1d9e0; /* Light border */
-  border-radius: 10px;       /* Rounded corners */
+  background-color: #1F1F1F;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4);
+  border-radius: 30px;
   padding: 10px 0;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Soft shadow */
+  margin-bottom: 15px;
 }
 
-/* Styling for the search icon */
 .search-icon {
-  font-size: 1.0rem;
-  color: #6c757d; /* Subtle color for icon */
+  padding-left: 10px;
+  font-size: 1.4rem;
+  transform: translateY(-15%);
+  color: #fff; 
 }
 
 /* Styling for the input field */
@@ -94,20 +90,14 @@ main {
   outline: none;
   width: 100%;
   background-color: transparent;
-  color: #495057; /* Text color */
-  font-size: 1rem;
-  padding: 0;
+  color: #fff;
+  font-size: 1.4rem;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  margin-left: 10px;
 }
 
 .search-input::placeholder {
   color: #adb5bd; /* Placeholder color */
 }
 
-/* Ensures full-width styling on smaller screens */
-/* @media (max-width: 480px) {
-  .custom-iconfield {
-    width: calc(100% - 40px);
-    margin-inline: 20px;
-  }
-} */
 </style>
