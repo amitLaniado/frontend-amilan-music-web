@@ -1,10 +1,9 @@
 <script setup lang="ts">
-// import Card from 'primevue/card';
 import Slider from 'primevue/slider';
 import Dialog from 'primevue/dialog';
 import List from './List.vue';
 
-import { ref, watch, onMounted } from 'vue';
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 import type { PlaylistDetails } from '@/interfaces';
 import { fetcPlaylistsDetails, addSongToPlaylist } from '@/api';
@@ -21,16 +20,18 @@ const captionSpanTitle = ref<HTMLElement | null>(null);
 const captionSpanChannel = ref<HTMLElement | null>(null);
 
 onMounted(() => {
-    if (caption.value) {
-        const captionOffsetWidth = caption.value.offsetWidth;
+    const observer = new ResizeObserver(() => {
+        const captionWidth = caption.value?.offsetWidth || 0;
+        [captionSpanTitle.value, captionSpanChannel.value].forEach((el) => {
+            el?.classList.toggle('marquee-animation', (el?.offsetWidth || 0) > captionWidth);
+        });
+    });
 
-        if (captionSpanTitle.value && captionSpanTitle.value.offsetWidth > captionOffsetWidth) {
-            captionSpanTitle.value.classList.add('marquee-animation');
-        }
-        if (captionSpanChannel.value && captionSpanChannel.value.offsetWidth > captionOffsetWidth) {
-            captionSpanChannel.value.classList.add('marquee-animation');
-        }
-    }
+    [caption.value, captionSpanTitle.value, captionSpanChannel.value]
+        .filter(Boolean)
+        .forEach((el) => observer.observe(el!));
+
+    onBeforeUnmount(() => observer.disconnect());
 });
 
 const initializeAudio = () => {
@@ -97,6 +98,7 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
 
 <template>
     <div class="song-container">
+        {{ captionSpanTitle?.offsetWidth }}
         <img 
             :src="`${songBuffer.getCurrSongDetails()?.base_pic_url}hqdefault.jpg`"
             class="song-image"
@@ -252,10 +254,6 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
     font-size: 1.5rem;
     color: #ffffff;
     cursor: pointer;
-}
-
-.control-icon:hover {
-    color: #333;
 }
 
 .play-button {
