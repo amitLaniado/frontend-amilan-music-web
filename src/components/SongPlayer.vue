@@ -101,7 +101,6 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
             :src="`${songBuffer.getCurrSongDetails()?.base_pic_url}hqdefault.jpg`"
             class="song-image"
         />
-        <div class="img-placeholder"></div>
 
         <div class="temp-name">
             <i 
@@ -201,51 +200,6 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
     height: 70%;
 }
 
-.caption {
-    width: 100%;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    /* position: relative; */
-}
-
-.caption-span {
-    white-space: nowrap;
-    overflow: hidden;
-    /* animation: marquee 10s linear infinite; */
-    color: #fff;
-    font-weight: bold;
-    padding-top: 0;
-    margin-top: 0;
-}
-
-.marquee-animation {
-    animation: marquee 10s linear infinite;
-}
-
-@keyframes marquee {
-    0% {
-        transform: translateX(0);
-    }
-    33% {
-        transform: translateX(100%);
-    }
-    33.01% {
-        transform: translateX(-100%);
-    }
-    66% {        
-        transform: translateX(0);
-    }
-    100% {
-        transform: translateX(0);
-    }
-}
-
-.caption-span:hover {
-    animation-play-state: paused;
-}
-
 .title {
     font-size: 1.0rem;
     color: #fff;
@@ -325,4 +279,68 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
     background-color: rgb(123, 131, 120) !important;
     border-radius: 3px !important;
 }
+
+.marquee-animation {
+    animation: marquee 10s linear infinite;
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(0);
+    }
+    33% {
+        transform: translateX(-100%);
+    }
+    33.01% {
+        transform: translateX(100%);
+    }
+    66% {        
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+/* @keyframes marquee {
+    0% {
+        transform: translateX(0);
+    }
+    33% {
+        transform: translateX(100%);
+    }
+    33.01% {
+        transform: translateX(-100%);
+    }
+    66% {        
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(0);
+    }
+} */
+
+.caption {
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+    /* position: relative; */
+}
+
+.caption-span {
+    white-space: nowrap;
+    overflow: hidden;
+    /* animation: marquee 10s linear infinite; */
+    color: #fff;
+    font-weight: bold;
+    padding-top: 0;
+    margin-top: 0;
+}
+
+.caption-span:hover {
+    animation-play-state: paused;
+}
+
 </style>

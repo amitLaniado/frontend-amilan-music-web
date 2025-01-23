@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import {ref} from 'vue';
 import { RouterLink, RouterView } from 'vue-router';
 
 import { Dialog } from 'primevue';
@@ -6,6 +7,26 @@ import { Dialog } from 'primevue';
 import { showSongPlayer, songBuffer } from './store';
 import SongPlayer from './components/SongPlayer.vue';
 import SongMenu from './components/SongMenu.vue';
+
+const routerItems = [
+  {
+    "path": "/",
+    "icon": "pi pi-home",
+    "text": "Home"
+  },
+  {
+    "path": "/search",
+    "icon": "pi pi-search",
+    "text": "Search"
+  },
+  {
+    "path": "/library",
+    "icon": "pi pi-bookmark",
+    "text": "Library"
+  },
+]
+
+const selectedRouterItemIndex = ref(0);
 </script>
 
 <template>
@@ -21,24 +42,26 @@ import SongMenu from './components/SongMenu.vue';
     </Dialog>
 
     <div class="bottom-things">
+      <!-- TODO: maybe it better to put here v-show instead v-if  -->
       <SongMenu 
         v-if="songBuffer.isEmpty() && !showSongPlayer"
         class="song-menu"
         @click="() => showSongPlayer = true"
       />
-  
-      <nav>
-        <RouterLink class="router-item" to="/">
-          <span class="pi pi-home"></span>
-          <p>Home</p>
-        </RouterLink>
-        <RouterLink class="router-item" to="/search">
-          <span class="pi pi-search"></span>
-          <p>Search</p>
-        </RouterLink>
-        <RouterLink class="router-item" to="/library">
-          <span class="pi pi-bookmark"></span>
-          <p>Library</p>
+
+      <nav class="navbar">
+        <RouterLink 
+          v-for="(item, index) in routerItems"
+          :key="item.path"
+          class="router-item"
+          :to="item.path"
+          :class="['router-item', selectedRouterItemIndex === index ? 'selected-router-item' : '']"  
+          @click="selectedRouterItemIndex = index"
+        >
+          <!-- <span :class="['router-item-icon', item.icon]" style="--icon-fill-color: red !important;"></span> -->
+          <!-- <span :class="['router-item-icon', item.icon]" style="--icon-fill-color: red !important"></span> -->
+          <span :class="['router-item-icon', item.icon]"></span>
+          <p class="router-item-text">{{ item.text }}</p>
         </RouterLink>
       </nav>  
     </div>
@@ -107,20 +130,34 @@ main {
   width: 100vw;
 } */
 
-nav {
+.navbar {
   display: flex;
   justify-content: space-around;
-  background-color: white; /* Optional: set background color */
+  background-color: rgba(24, 24, 24, 0.95); /* Optional: set background color */
+  backdrop-filter: blur(10px); /* Optional for a frosted-glass effect */
   padding: 10px 0;         /* Optional: add padding for spacing */
-  box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1); /* Optional: shadow for separation */
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.7); /* Creates separation */
 }
 
 .router-item {
-  color: black;
+  color: #b3b3b3;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-decoration: none;
+  gap: 0.2rem;
+}
+.router-item-icon {
+  font-size: 1rem !important;
+}
+.router-item-text {
+  font-size: 0.5rem;
+}
+.router-item:active {
+  transform: scale(1.1);
+}
+.selected-router-item {
+  color: #fff !important;
 }
 
 </style>
