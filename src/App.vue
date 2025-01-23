@@ -10,12 +10,12 @@ import SongMenu from './components/SongMenu.vue';
 
 <template>
   <div class="container">
-    <RouterView />
+    <RouterView/>
 
     <Dialog
-        v-model:visible="showSongPlayer"
-        position="bottom"
-        class="song-player-dialog"
+      v-model:visible="showSongPlayer"
+      position="bottom"
+      class="song-player-dialog"
     >
       <SongPlayer />
     </Dialog>
@@ -54,20 +54,53 @@ import SongMenu from './components/SongMenu.vue';
   margin: 0;
 }
 
-body {
-  background-color: #121212;
+/* Hide scrollbar for Chrome, Safari and Opera */
+*::-webkit-scrollbar {
+  display: none;
 }
 
-/* .song-player-dialog {
+/* Hide scrollbar for IE, Edge and Firefox */
+* {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+body {
+  background-color: #121212;
+  /* overflow: hidden; */
+}
+
+.song-player-dialog {
   width: 100vw;
   height: 100vh;
   margin: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: linear-gradient(180deg, #0e431d, #121212) !important;
 }
- */
+
+.p-dialog {
+  max-height: 100% !important;
+}
+
 .bottom-things {
   position: fixed;
   bottom: 0;
   width: 100%;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  padding: 50px 40px 0px;
+}
+
+.page-title {
+  color: #fff;
+  text-align: left;
+  font-size: 1.5rem;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  margin-bottom: 30px;
 }
 
 /* .song-menu {

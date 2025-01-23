@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import Button from 'primevue/button';
-
 import { defineProps, onMounted, ref } from 'vue';
 import { type SongDetails } from '@/interfaces';
 import { fetcPlaylistSongsDetails } from '@/api';
@@ -35,45 +33,75 @@ const shufflePlaylist = () => {
 </script>
 
 <template>
-    <main>
-        <p>Platlist view</p>
-
-        <Button
-          class="p-button-rounded"
-          @click="shufflePlaylist"
-        >
-          <template #icon>
-            <i class="fa-solid fa-shuffle"></i>
-          </template>
-        </Button>
-
-        <!-- button to play the playlist -->
-        <!-- button to shaffle -->
-        <List 
-            class="songs-list"
-            :data="songs"
-            titleAttrName="title"
-            subtitleAttrName="channel"
-            @selectItem="selectSong"
+  <div class="playlist-view-container">
+    <div class="playlist-header">
+      <h3 class="songs-amount">{{ songs.length }} songs</h3>
+  
+      <div class="playlist-controls">
+        <i 
+          class="fa-solid fa-play play-button" 
+          @click="selectSong(0)"
         />
-    </main>
+
+        <i
+          class="fa-solid fa-shuffle shuffle-button" 
+          @click="shufflePlaylist"
+        />
+      </div>
+    </div>
+    <!-- button to play the playlist -->
+    <!-- button to shaffle -->
+    <List 
+      class="songs-list"
+      :data="songs"
+      titleAttrName="title"
+      subtitleAttrName="channel"
+      picUrlAttrName="base_pic_url"
+      picUrlEndpoint="default.jpg"
+      @selectItem="selectSong"
+    />
+  </div>
 </template>
 
 
 <style scoped>
-main {
+.playlist-header {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  padding: 20px;
-  overflow-y: hidden;
+  justify-content: space-between;
+}
+.playlist-controls {
+  display: flex;
+  margin-right: 1rem;
+  align-items: center;
+}
+.play-button {
+  width: 2.8rem;
+  height: 2.8rem;
+  font-size: 1.3rem;
+  color: #fff;
+  margin-right: 0.2rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #508b3c;
+  border-radius: 50%;
+}
+.shuffle-button {
+  font-size: 1.2rem;
+  color: #fff;
+  margin-left: 10px;
+  cursor: pointer;
 }
 
-p {
-  text-align: center;
+.songs-amount {
+  color: #fff;
+  font-size: 1.5rem !important;
 }
 
-.songs-list {
-  width: 400px;
-}
+/* .songs-list {
+  overflow-y: auto;
+  flex-grow: 1;
+} */
 </style>

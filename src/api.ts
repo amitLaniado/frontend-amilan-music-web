@@ -10,7 +10,8 @@ export const fetchSongOptions = async (songName: string): Promise<SongDetails[] 
         console.log("search song options for: ", songName);
 
         const response = await axios.get(`${backendServiceUrl}/song/songOptions/${songName}`);
-        return response.data.songs_details;
+        const songOptions = response.data.songs_details;
+        return songOptions;
     } catch (error) {
         console.error("error: ", error);
     }

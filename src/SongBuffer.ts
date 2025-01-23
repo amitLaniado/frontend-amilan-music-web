@@ -52,7 +52,7 @@ class SongBuffer {
     public async loadMp3Url(index: number = this.currSongIndex) {
         if (!this.songs[index].mp3Url) {
             const song = this.songs[index];
-            const songUrl = song.songDetails.url;
+            const songUrl = song.songDetails.song_url;
             song.mp3Url = await fetchMp3File(songUrl) ?? null;
         }
     }

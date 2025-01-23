@@ -71,14 +71,19 @@ const showPlaylistsDialog = async () => {
 const addCurrSongToPlaylist = async (playlistIndex: number) => {
     const playlistId: number = playlistsDetails.value[playlistIndex].id;
     const currSongDetails = songBuffer.value.getCurrSongDetails();
-    const playlist_song_id: number | undefined = currSongDetails ?
-        await addSongToPlaylist(currSongDetails, playlistId) : undefined;
+    currSongDetails && await addSongToPlaylist(currSongDetails, playlistId);
+    // const playlist_song_id: number | undefined = currSongDetails ?
+    //     await addSongToPlaylist(currSongDetails, playlistId) : undefined;
     dialogVisible.value = false;
 }
 </script>
 
 <template>
     <div class="song-container">
+        <img 
+            :src="`${songBuffer.getCurrSongDetails()?.base_pic_url}hqdefault.jpg`"
+            class="song-image"
+        />
         <div class="img-placeholder"></div>
 
         <div class="temp-name">
@@ -87,11 +92,10 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
                 @click="showPlaylistsDialog"
             ></i>
 
-            <!-- TODO: put this dialog in new component -->
             <Dialog
                 v-model:visible="dialogVisible"
                 header="add song to playlist"
-                class="playlists-dialog"
+                class="playlists-dialog playlist-list"
             >
                 <List
                     :data="playlistsDetails"
@@ -99,6 +103,7 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
                     titleAttrName="name"
                     subtitleAttrName="songs_amount"
                     subtitlePrefix="songs amount: "
+                    picUrlAttrName="pic_url"
                     @selectItem="addCurrSongToPlaylist"
                 />
                 <!-- TODO: maybe add confirm dialog after adding song to playlist -->
@@ -117,6 +122,7 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
                 :min="0"
                 :max="duration"
                 @update:model-value="changeCurrentTime"
+                class="timeline-slider"
             />
             <div class="show-times">
                 <p class="time-text">{{ formatSecondsTime(currentTime) }}</p>
@@ -126,22 +132,22 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
 
         <div class="controls">
             <i 
-                class="pi pi-step-backward control-icon"
+                class="fa-solid fa-backward control-icon" 
                 @click="songBuffer.previousSong()"
-            ></i>
+            />
             <i 
-                :class="['control-icon', isPlaying ? 'pi pi-pause' : 'pi pi-play']"
+                class="fa-solid fa-play play-button" 
                 @click="togglePlay"
-            ></i>
+            />
             <i 
-                class="pi pi-step-forward control-icon"
+                class="fa-solid fa-forward control-icon"
                 @click="songBuffer.skipSong()"
-            ></i>
+            />
         </div>
     </div>
 </template>
 
-<style>
+<style scoped>
 .song-container {
     display: flex;
     flex-direction: column;
@@ -150,33 +156,36 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
     width: 100%;
 }
 
-.img-placeholder {
-    width: 300px;
-    height: 300px;
-    background-color: #e0e0e0;
-    border-radius: 8px;
-    margin-bottom: 1rem;
+.song-image {
+    width: 80vw; /* Set the width to 80% of the viewport width */
+    height: 45vh; /* Maintain a 75% height-to-width ratio (3:4 aspect ratio) */
+    /* aspect-ratio: 4 / 3; Maintain a 75% height-to-width ratio (3:4 aspect ratio) */
+    object-fit: cover; /* Ensures the image scales properly within the dimensions */
+    border-radius: 18px;
+    margin-top: 1rem;
 }
 
 .temp-name {
     width: 100%;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
 }
 
 .add-to-playlist {
-    padding-top: 0.6rem;
     font-size: 1.5rem !important;
-    margin-right: 5%;
+    margin-right: 1rem;
+    color: #fff;
 }
 
 .playlists-dialog {
     width: 80%;
     height: 70%;
 }
-.p-dialog-header {
+/* .p-dialog-header {
     padding-block: 0.5rem 0 !important;
-}
+} */
 /* .p-button-icon {
     padding: 0 !important;
     margin: 0 !important;
@@ -212,12 +221,21 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
     position: relative;
 }
 
+.timeline-slider {
+    width: 100% !important;
+    height: 6px !important;
+    background-color: rgba(16, 33, 11, 0.848) !important;
+    /* background-color: rgba(16, 33, 11, 0.843) !important; */
+    border-radius: 3px !important;
+}
+
 .show-times {
     display: flex;
     justify-content: space-between;
 }
 
 .time-text {
+    color: #929292;
     font-size: smaller;
     margin-top: 5px;
 }
@@ -225,17 +243,39 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
 .controls {
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 2.0rem;
-    margin-top: 1rem;
+    margin-top: 0.4rem;
 }
 
 .control-icon {
     font-size: 1.5rem;
-    color: #666;
+    color: #ffffff;
     cursor: pointer;
 }
 
 .control-icon:hover {
     color: #333;
+}
+
+.play-button {
+    width: 2.8rem;
+    height: 2.8rem;
+    font-size: 1.3rem;
+    color: #092e14;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-left: 0.2rem;
+    background-color: #fff;
+    border-radius: 50%;
+}
+
+</style>
+
+<style>
+.p-slider-range {
+    background-color: rgb(123, 131, 120) !important;
 }
 </style>
