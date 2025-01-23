@@ -4,7 +4,7 @@ import Slider from 'primevue/slider';
 import Dialog from 'primevue/dialog';
 import List from './List.vue';
 
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 
 import type { PlaylistDetails } from '@/interfaces';
 import { fetcPlaylistsDetails, addSongToPlaylist } from '@/api';
@@ -15,6 +15,23 @@ const duration = ref<number>(0);
 
 const playlistsDetails = ref<PlaylistDetails[]>([]);
 const dialogVisible = ref<boolean>(false);
+
+const caption = ref<HTMLElement | null>(null);
+const captionSpanTitle = ref<HTMLElement | null>(null);
+const captionSpanChannel = ref<HTMLElement | null>(null);
+
+onMounted(() => {
+    if (caption.value) {
+        const captionOffsetWidth = caption.value.offsetWidth;
+
+        if (captionSpanTitle.value && captionSpanTitle.value.offsetWidth > captionOffsetWidth) {
+            captionSpanTitle.value.classList.add('marquee-animation');
+        }
+        if (captionSpanChannel.value && captionSpanChannel.value.offsetWidth > captionOffsetWidth) {
+            captionSpanChannel.value.classList.add('marquee-animation');
+        }
+    }
+});
 
 const initializeAudio = () => {
     if (audio.value) {
@@ -109,9 +126,9 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
                 <!-- TODO: maybe add confirm dialog after adding song to playlist -->
             </Dialog>
                 
-            <div class="caption">
-                <h2 class="title">{{ songBuffer.getCurrSongDetails()?.title }}</h2>
-                <h4 class="subtitle">{{ songBuffer.getCurrSongDetails()?.channel }}</h4>
+            <div ref="caption" class="caption">
+                <span ref="captionSpanTitle" class="caption-span title">{{ songBuffer.getCurrSongDetails()?.title }}</span>
+                <span ref="captionSpanChannel" class="caption-span channel">{{ songBuffer.getCurrSongDetails()?.channel }}</span>
             </div>
         </div>
 
@@ -136,7 +153,7 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
                 @click="songBuffer.previousSong()"
             />
             <i 
-                class="fa-solid fa-play play-button" 
+                :class="['play-button', isPlaying ? 'fa-solid fa-pause' : 'fa-solid fa-play']"
                 @click="togglePlay"
             />
             <i 
@@ -157,10 +174,10 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
 }
 
 .song-image {
-    width: 80vw; /* Set the width to 80% of the viewport width */
+    width: 80vw;
     height: 45vh; /* Maintain a 75% height-to-width ratio (3:4 aspect ratio) */
     /* aspect-ratio: 4 / 3; Maintain a 75% height-to-width ratio (3:4 aspect ratio) */
-    object-fit: cover; /* Ensures the image scales properly within the dimensions */
+    object-fit: cover; 
     border-radius: 18px;
     margin-top: 1rem;
 }
@@ -183,31 +200,60 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
     width: 80%;
     height: 70%;
 }
-/* .p-dialog-header {
-    padding-block: 0.5rem 0 !important;
-} */
-/* .p-button-icon {
-    padding: 0 !important;
-    margin: 0 !important;
-}
- */
+
 .caption {
-    text-align: right;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    /* position: relative; */
 }
 
-.caption .title {
-    width: 100%;
-    font-size: 1.5rem;
+.caption-span {
+    white-space: nowrap;
+    overflow: hidden;
+    /* animation: marquee 10s linear infinite; */
+    color: #fff;
     font-weight: bold;
     padding-top: 0;
     margin-top: 0;
-    /* margin-inline: 0; */
-    margin-left: auto;
-    margin-bottom: 0.3rem;
 }
 
-.caption .subtitle {
-    font-size: 1rem;
+.marquee-animation {
+    animation: marquee 10s linear infinite;
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(0);
+    }
+    33% {
+        transform: translateX(100%);
+    }
+    33.01% {
+        transform: translateX(-100%);
+    }
+    66% {        
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.caption-span:hover {
+    animation-play-state: paused;
+}
+
+.title {
+    font-size: 1.0rem;
+    color: #fff;
+    margin: 0;
+}
+
+.channel {
+    font-size: 0.8rem;
     color: #666;
     margin: 0;
 }
@@ -267,7 +313,7 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding-left: 0.2rem;
+    /* padding-left: 0.2rem; */
     background-color: #fff;
     border-radius: 50%;
 }
@@ -277,5 +323,6 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
 <style>
 .p-slider-range {
     background-color: rgb(123, 131, 120) !important;
+    border-radius: 3px !important;
 }
 </style>
