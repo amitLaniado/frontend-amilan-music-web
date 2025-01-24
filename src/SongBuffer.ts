@@ -20,6 +20,11 @@ class SongBuffer {
         return this.songs.length ? this.songs[this.currSongIndex].mp3Url : null;
     }
 
+    public getNextSongsDetails(): SongDetails[] {
+        const nextSongs = this.songs.slice(this.nextSongIndex());
+        return nextSongs.map(song => song.songDetails);
+    }
+
     private isLastSong(): boolean {
         return this.songs.length - 1 <= this.currSongIndex;
     }
@@ -33,7 +38,6 @@ class SongBuffer {
         return this.isFirstSong() ? 
             this.songs.length - 1 : this.currSongIndex - 1;
     }
-
     
     public isEmpty(): boolean {
         return !!this.songs.length;
@@ -65,6 +69,12 @@ class SongBuffer {
     public previousSong() {
         this.currSongIndex = this.previosSongIndex();
         this.loadMp3Url(this.previosSongIndex());
+    }
+
+    public async skipToSong(index: number) {
+        this.currSongIndex += index + 1;
+        await this.loadMp3Url();
+        this.loadMp3Url(this.nextSongIndex());
     }
 
     public revokeMp3Url(index: number) {

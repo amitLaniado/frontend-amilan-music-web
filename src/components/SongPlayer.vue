@@ -3,11 +3,15 @@ import Slider from 'primevue/slider';
 import Dialog from 'primevue/dialog';
 import List from './List.vue';
 
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { onBeforeUnmount, onMounted, ref, watch, defineModel } from 'vue';
 
 import type { PlaylistDetails } from '@/interfaces';
 import { fetcPlaylistsDetails, addSongToPlaylist } from '@/api';
 import { songBuffer, isPlaying, audio, togglePlay } from '@/store';
+
+const showNextSongs = defineModel('showNextSongs');
+
+// const showNextSongs = ref(false);
 
 const currentTime = ref<number>(0);
 const duration = ref<number>(0);
@@ -90,15 +94,49 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
     const playlistId: number = playlistsDetails.value[playlistIndex].id;
     const currSongDetails = songBuffer.value.getCurrSongDetails();
     currSongDetails && await addSongToPlaylist(currSongDetails, playlistId);
-    // const playlist_song_id: number | undefined = currSongDetails ?
-    //     await addSongToPlaylist(currSongDetails, playlistId) : undefined;
     dialogVisible.value = false;
+}
+
+const skipToSong = async (index: number) => {
+    await songBuffer.value.skipToSong(index);
 }
 </script>
 
 <template>
-    <div class="song-container">
-        {{ captionSpanTitle?.offsetWidth }}
+    <div
+        v-if="showNextSongs" 
+        class="next-songs-list"
+    >
+        <div class="current-song-section">
+            <h3 class="section-text">Current Song</h3>
+            <List
+                :data="[songBuffer.getCurrSongDetails()]"
+                class="current-song"
+                titleAttrName="title"
+                subtitleAttrName="channel"
+                picUrlAttrName="base_pic_url"
+                picUrlEndpoint="default.jpg"
+                @selectItem="(index) => skipToSong(index)"
+            />
+        </div>
+
+        <div class="next-songs-section">
+            <h3 class="section-text">Next Songs</h3>
+            <List
+                :data="songBuffer.getNextSongsDetails()"
+                class="next-songs"
+                titleAttrName="title"
+                subtitleAttrName="channel"
+                picUrlAttrName="base_pic_url"
+                picUrlEndpoint="default.jpg"
+                @selectItem="(index) => songBuffer.skipToSong(index)"
+            />
+        </div>
+    </div>
+    <div
+        v-else
+        class="song-player-container"
+    >
         <img 
             :src="`${songBuffer.getCurrSongDetails()?.base_pic_url}hqdefault.jpg`"
             class="song-image"
@@ -166,12 +204,18 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
 </template>
 
 <style scoped>
-.song-container {
+.song-player-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     width: 100%;
+}
+
+.section-text {
+    color: #fff;
+    font-size: 1.2rem;
+    margin: 0;
 }
 
 .song-image {
@@ -265,7 +309,6 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* padding-left: 0.2rem; */
     background-color: #fff;
     border-radius: 50%;
 }
@@ -300,45 +343,20 @@ const addCurrSongToPlaylist = async (playlistIndex: number) => {
     }
 }
 
-/* @keyframes marquee {
-    0% {
-        transform: translateX(0);
-    }
-    33% {
-        transform: translateX(100%);
-    }
-    33.01% {
-        transform: translateX(-100%);
-    }
-    66% {        
-        transform: translateX(0);
-    }
-    100% {
-        transform: translateX(0);
-    }
-} */
-
 .caption {
     width: 100%;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: end;
-    /* position: relative; */
 }
 
 .caption-span {
     white-space: nowrap;
     overflow: hidden;
-    /* animation: marquee 10s linear infinite; */
     color: #fff;
     font-weight: bold;
     padding-top: 0;
     margin-top: 0;
 }
-
-.caption-span:hover {
-    animation-play-state: paused;
-}
-
 </style>

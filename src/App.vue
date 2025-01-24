@@ -8,6 +8,8 @@ import { showSongPlayer, songBuffer } from './store';
 import SongPlayer from './components/SongPlayer.vue';
 import SongMenu from './components/SongMenu.vue';
 
+const showNextSongs = ref(false);
+
 const routerItems = [
   {
     "path": "/",
@@ -24,7 +26,7 @@ const routerItems = [
     "icon": "pi pi-bookmark",
     "text": "Library"
   },
-]
+];
 
 const selectedRouterItemIndex = ref(0);
 </script>
@@ -38,7 +40,16 @@ const selectedRouterItemIndex = ref(0);
       position="bottom"
       class="song-player-dialog"
     >
-      <SongPlayer />
+      <template #header>
+        <i 
+          :class="['show-next-song-button', showNextSongs ? 'fa-solid fa-music' : 'pi pi-list']"
+          @click="showNextSongs = !showNextSongs" 
+        />
+      </template>
+
+      <SongPlayer
+        v-model:showNextSongs="showNextSongs"
+      />
     </Dialog>
 
     <div class="bottom-things">
@@ -101,9 +112,19 @@ body {
   border-radius: 0 !important;
   background: linear-gradient(180deg, #0e431d, #121212) !important;
 }
-
 .p-dialog {
   max-height: 100% !important;
+}
+.p-dialog-header-actions:hover {
+  background-color: transparent !important;
+}
+.p-dialog-close-button, .show-next-song-button {
+  color: #fff !important;
+  font-size: 1.2rem !important;
+  cursor: pointer;
+}
+.p-dialog-close-button:hover {
+  background-color: #718677a4 !important;
 }
 
 .bottom-things {
