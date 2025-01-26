@@ -4,7 +4,7 @@ import InputIcon from 'primevue/inputicon';
 import InputText from 'primevue/inputtext';
 
 import SongsList from '@/components/List.vue';
-import SongPlayer from '@/components/SongPlayer.vue';
+import SongPlayer from '@/components/songViewes/SongPlayerView.vue';
 
 import { ref } from 'vue';
 
@@ -22,7 +22,7 @@ const getSongOptions = async () => {
 }
 
 const selectSong = (index: number) => {
-  songBuffer.value.setSongs([songs.value[index]]);
+  songBuffer.setSongs([songs.value[index]]);
   isSelected.value = true;
 }
 </script>

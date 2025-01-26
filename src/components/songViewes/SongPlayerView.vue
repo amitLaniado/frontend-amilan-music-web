@@ -1,75 +1,32 @@
 <script setup lang="ts">
 import Slider from 'primevue/slider';
 import Dialog from 'primevue/dialog';
-import List from './List.vue';
+import List from '../List.vue';
 
-import { onBeforeUnmount, onMounted, ref, watch, defineModel } from 'vue';
+import { ref, watch, defineModel } from 'vue';
+import type { Ref } from 'vue';
 
 import type { PlaylistDetails } from '@/interfaces';
-import { fetcPlaylistsDetails, addSongToPlaylist } from '@/api';
-import { songBuffer, isPlaying, audio, togglePlay } from '@/store';
+import { fetcPlaylistsDetails } from '@/api';
+import { songBuffer, songPlayer } from '@/store';
+
+import Caption from './Caption.vue';
 
 const showNextSongs = defineModel('showNextSongs');
 
-// const showNextSongs = ref(false);
-
-const currentTime = ref<number>(0);
-const duration = ref<number>(0);
+const currentTime: Ref<number> = ref<number>(0);
+const duration: Ref<number> = ref<number>(0);
 
 const playlistsDetails = ref<PlaylistDetails[]>([]);
 const dialogVisible = ref<boolean>(false);
 
-const caption = ref<HTMLElement | null>(null);
-const captionSpanTitle = ref<HTMLElement | null>(null);
-const captionSpanChannel = ref<HTMLElement | null>(null);
-
-onMounted(() => {
-    const observer = new ResizeObserver(() => {
-        const captionWidth = caption.value?.offsetWidth || 0;
-        [captionSpanTitle.value, captionSpanChannel.value].forEach((el) => {
-            el?.classList.toggle('marquee-animation', (el?.offsetWidth || 0) > captionWidth);
-        });
-    });
-
-    [caption.value, captionSpanTitle.value, captionSpanChannel.value]
-        .filter(Boolean)
-        .forEach((el) => observer.observe(el!));
-
-    onBeforeUnmount(() => observer.disconnect());
-});
-
-const initializeAudio = () => {
-    if (audio.value) {
-        audio.value.pause(); // Pause existing audio if it's playing
-        isPlaying.value = false;
+watch(songPlayer, () => {
+    const songPlayerValue = songPlayer.value;
+    if (songPlayerValue) {
+        currentTime.value = songPlayerValue.getCurrentTime();
+        duration.value = songPlayerValue.getDuration();
     }
-
-    const currSongMp3Url = songBuffer.value.getCurrSongMp3Url();
-    if (currSongMp3Url) {
-        audio.value = new Audio(currSongMp3Url);
-        audio.value.addEventListener('timeupdate', () => {
-            currentTime.value = audio.value?.currentTime ?? 0;
-            duration.value = audio.value?.duration ?? 0;
-        });
-        audio.value.play();
-        isPlaying.value = true;
-    }
-}
-
-watch(
-    () => songBuffer.value.getCurrSongMp3Url(),
-    (mp3Url) => {
-        if (mp3Url) initializeAudio();
-    }
-);
-
-watch(
-    currentTime,
-    () => {
-        currentTime.value === duration.value &&
-            songBuffer.value.skipSong(); 
-    }
-)
+}, { deep: true });
 
 const formatSecondsTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -80,8 +37,7 @@ const formatSecondsTime = (seconds: number) => {
 
 const changeCurrentTime = (value: number | number[]): void => {
     const newTime = Array.isArray(value) ? value[0] : value;
-    currentTime.value = newTime;
-    if (audio.value) audio.value.currentTime = newTime;
+    songPlayer.value?.seekToTime(newTime);
 }
 
 const showPlaylistsDialog = async () => {
@@ -92,14 +48,12 @@ const showPlaylistsDialog = async () => {
 
 const addCurrSongToPlaylist = async (playlistIndex: number) => {
     const playlistId: number = playlistsDetails.value[playlistIndex].id;
-    const currSongDetails = songBuffer.value.getCurrSongDetails();
-    currSongDetails && await addSongToPlaylist(currSongDetails, playlistId);
+    await songPlayer.value?.addSongToPlaylist(playlistId);
     dialogVisible.value = false;
 }
 
-const skipToSong = async (index: number) => {
-    await songBuffer.value.skipToSong(index);
-}
+const skipToSong = async (index: number) => 
+    await songBuffer.skipToSong(index);
 </script>
 
 <template>
@@ -110,13 +64,12 @@ const skipToSong = async (index: number) => {
         <div class="current-song-section">
             <h3 class="section-text">Current Song</h3>
             <List
-                :data="[songBuffer.getCurrSongDetails()]"
+                :data="[songPlayer?.getSongDetails() || []]"
                 class="current-song"
                 titleAttrName="title"
                 subtitleAttrName="channel"
                 picUrlAttrName="base_pic_url"
                 picUrlEndpoint="default.jpg"
-                @selectItem="(index) => skipToSong(index)"
             />
         </div>
 
@@ -129,7 +82,7 @@ const skipToSong = async (index: number) => {
                 subtitleAttrName="channel"
                 picUrlAttrName="base_pic_url"
                 picUrlEndpoint="default.jpg"
-                @selectItem="(index) => songBuffer.skipToSong(index)"
+                @selectItem="(index) => skipToSong(index + 1)"
             />
         </div>
     </div>
@@ -138,7 +91,7 @@ const skipToSong = async (index: number) => {
         class="song-player-container"
     >
         <img 
-            :src="`${songBuffer.getCurrSongDetails()?.base_pic_url}hqdefault.jpg`"
+            :src="`${songPlayer?.getPicUrl()}hqdefault.jpg`"
             class="song-image"
         />
 
@@ -165,10 +118,7 @@ const skipToSong = async (index: number) => {
                 <!-- TODO: maybe add confirm dialog after adding song to playlist -->
             </Dialog>
                 
-            <div ref="caption" class="caption">
-                <span ref="captionSpanTitle" class="caption-span title">{{ songBuffer.getCurrSongDetails()?.title }}</span>
-                <span ref="captionSpanChannel" class="caption-span channel">{{ songBuffer.getCurrSongDetails()?.channel }}</span>
-            </div>
+            <Caption channel-text-color="#666" />
         </div>
 
         <div class="timeline">
@@ -181,8 +131,10 @@ const skipToSong = async (index: number) => {
                 class="timeline-slider"
             />
             <div class="show-times">
+                <!-- <p class="time-text">{{ formatSecondsTime(songPlayer?.getCurrentTime() || 0) }}</p>
+                <p class="time-text">{{ formatSecondsTime(songPlayer?.getDuration() || 0)}}</p> -->
                 <p class="time-text">{{ formatSecondsTime(currentTime) }}</p>
-                <p class="time-text">{{ formatSecondsTime(duration) }}</p>
+                <p class="time-text">{{ formatSecondsTime(duration)}}</p>
             </div>
         </div>
 
@@ -192,8 +144,8 @@ const skipToSong = async (index: number) => {
                 @click="songBuffer.previousSong()"
             />
             <i 
-                :class="['play-button', isPlaying ? 'fa-solid fa-pause' : 'fa-solid fa-play']"
-                @click="togglePlay"
+                :class="['play-button', songPlayer?.getIsPlaying() ? 'fa-solid fa-pause' : 'fa-solid fa-play']"
+                @click="songPlayer?.togglePlay()"
             />
             <i 
                 class="fa-solid fa-forward control-icon"
@@ -244,18 +196,6 @@ const skipToSong = async (index: number) => {
 .playlists-dialog {
     width: 80%;
     height: 70%;
-}
-
-.title {
-    font-size: 1.0rem;
-    color: #fff;
-    margin: 0;
-}
-
-.channel {
-    font-size: 0.8rem;
-    color: #666;
-    margin: 0;
 }
 
 .timeline {
@@ -319,44 +259,5 @@ const skipToSong = async (index: number) => {
 .p-slider-range {
     background-color: rgb(123, 131, 120) !important;
     border-radius: 3px !important;
-}
-
-.marquee-animation {
-    animation: marquee 10s linear infinite;
-}
-
-@keyframes marquee {
-    0% {
-        transform: translateX(0);
-    }
-    33% {
-        transform: translateX(-100%);
-    }
-    33.01% {
-        transform: translateX(100%);
-    }
-    66% {        
-        transform: translateX(0);
-    }
-    100% {
-        transform: translateX(0);
-    }
-}
-
-.caption {
-    width: 100%;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: end;
-}
-
-.caption-span {
-    white-space: nowrap;
-    overflow: hidden;
-    color: #fff;
-    font-weight: bold;
-    padding-top: 0;
-    margin-top: 0;
 }
 </style>

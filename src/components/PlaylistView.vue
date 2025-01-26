@@ -14,7 +14,7 @@ onMounted(async () => {
 });
 
 const selectSong = (index: number) => {
-  songBuffer.value.setSongs(songs.value, index);
+  songBuffer.setSongs(songs.value, index);
   showSongPlayer.value = true;
 }
 

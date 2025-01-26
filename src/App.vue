@@ -5,8 +5,8 @@ import { RouterLink, RouterView } from 'vue-router';
 import { Dialog } from 'primevue';
 
 import { showSongPlayer, songBuffer } from './store';
-import SongPlayer from './components/SongPlayer.vue';
-import SongMenu from './components/SongMenu.vue';
+import SongPlayer from './components/songViewes/SongPlayerView.vue';
+import SongMenu from './components/songViewes/SongMenu.vue';
 
 const showNextSongs = ref(false);
 

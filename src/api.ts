@@ -54,7 +54,7 @@ export const fetcPlaylistSongsDetails = async (playlistId: number): Promise<Song
     }
 };
 
-export const addSongToPlaylist = async (songDetails: SongDetails, playlistId: number): Promise<number | undefined> => {
+export const fetchAddSongToPlaylist = async (songDetails: SongDetails, playlistId: number): Promise<number | undefined> => {
     try {
         const body: { song_details: SongDetails, playlist_id: number} = { song_details: songDetails, playlist_id: playlistId };
         const response = await axios.post(`${backendServiceUrl}/playlists/add_song`, body);
